@@ -18,6 +18,17 @@ func NewBloomFilter(k, m uint) *BloomFilter {
 	}
 }
 
+func (bf *BloomFilter) Add(data []byte) {
+	indices := bf.getIndices(data)
+
+	for idx := range indices {
+		targetByte := idx / 8
+		targetBit := idx % 8
+
+		bf.bitset[targetByte] |= 1 << targetBit
+	}
+}
+
 func (bf *BloomFilter) getIndices(data []byte) []uint {
 	h := fnv.New64a()
 	h.Write(data)
