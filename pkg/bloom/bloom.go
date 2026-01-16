@@ -29,6 +29,23 @@ func (bf *BloomFilter) Add(data []byte) {
 	}
 }
 
+func (bf *BloomFilter) Contains(data []byte) bool {
+	indices := bf.getIndices(data)
+
+	for idx := range indices {
+		targetByte := idx / 8
+		targetBit := idx % 8
+
+		exists := bf.bitset[targetByte]&(1<<targetBit) != 0
+
+		if !exists {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (bf *BloomFilter) getIndices(data []byte) []uint {
 	h := fnv.New64a()
 	h.Write(data)
