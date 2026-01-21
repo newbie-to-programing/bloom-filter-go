@@ -1,6 +1,9 @@
 package bloom
 
-import "hash/fnv"
+import (
+	"hash/fnv"
+	"math"
+)
 
 type BloomFilter struct {
 	k      uint
@@ -44,6 +47,18 @@ func (bf *BloomFilter) Contains(data []byte) bool {
 	}
 
 	return true
+}
+
+func EstimateParameters(n uint, p float64) (uint, uint) {
+	// m = - (n * ln(p)) / (ln(2)^2)
+	mFloat := -float64(n) * math.Log(p) / math.Pow(math.Log(2), 2)
+	m := uint(math.Ceil(mFloat))
+
+	// k = (m / n) * ln(2)
+	kFloat := (float64(m) / float64(n)) * math.Log(2)
+	k := uint(math.Ceil(kFloat))
+
+	return m, k
 }
 
 func (bf *BloomFilter) getIndices(data []byte) []uint {
