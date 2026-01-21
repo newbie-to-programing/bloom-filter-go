@@ -1,7 +1,7 @@
 package bloom
 
 import (
-	"math"
+	_ "math"
 	"testing"
 )
 

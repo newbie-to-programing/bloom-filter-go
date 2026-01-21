@@ -3,15 +3,17 @@ package bloom
 import (
 	"hash/fnv"
 	"math"
+	"sync"
 )
 
 type BloomFilter struct {
+	mu     sync.RWMutex
 	k      uint
 	m      uint
 	bitset []byte
 }
 
-func NewBloomFilter(k, m uint) *BloomFilter {
+func New(k, m uint) *BloomFilter {
 	numBytes := (m + 7) / 8
 
 	return &BloomFilter{
@@ -22,6 +24,9 @@ func NewBloomFilter(k, m uint) *BloomFilter {
 }
 
 func (bf *BloomFilter) Add(data []byte) {
+	bf.mu.Lock()
+	defer bf.mu.Unlock()
+
 	indices := bf.getIndices(data)
 
 	for idx := range indices {
@@ -33,6 +38,9 @@ func (bf *BloomFilter) Add(data []byte) {
 }
 
 func (bf *BloomFilter) Contains(data []byte) bool {
+	bf.mu.RLock()
+	defer bf.mu.RUnlock()
+
 	indices := bf.getIndices(data)
 
 	for idx := range indices {
