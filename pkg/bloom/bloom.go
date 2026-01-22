@@ -13,7 +13,7 @@ type BloomFilter struct {
 	bitset []byte
 }
 
-func New(k, m uint) *BloomFilter {
+func New(m, k uint) *BloomFilter {
 	numBytes := (m + 7) / 8
 
 	return &BloomFilter{
